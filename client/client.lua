@@ -209,7 +209,7 @@ Citizen.CreateThread(function()
     end
 end)
 
--- Menú para eliminar ubicaciones de lavado
+-- Menu to delete wash locations
 local function OpenSingleMoneywashMenu(index)
     local v = moneywashers[index]
     if not v then

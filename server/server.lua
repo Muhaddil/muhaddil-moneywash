@@ -48,8 +48,9 @@ local moneywashers = {}
 local function loadMoneywashers()
     local file = LoadResourceFile(GetCurrentResourceName(), "moneywashers.json")
     if file then
-        moneywashers = json.decode(file) or {} -- Asegurarse de que sea una tabla incluso si el archivo está vacío o corrupto
-        -- Asegurarse de que moneywashers es una tabla si el archivo no existe o está vacío
+        moneywashers = json.decode(file) or {}
+        -- Ensure it's a table even if the file is empty or corrupt
+        -- Ensure moneywashers is a table if the file doesn't exist or is empty
         if type(moneywashers) ~= 'table' then
             moneywashers = {}
         end
@@ -79,7 +80,7 @@ AddEventHandler('onResourceStart', function(resource)
     end
 end)
 
--- Añadir un callback para obtener el trabajo del jugador
+-- Add a callback to get the player's job
 ESX.RegisterServerCallback('muhaddil-moneywash:getPlayerJob', function(src, cb)
     local xPlayer = ESX.GetPlayerFromId(src)
     if xPlayer then
@@ -89,14 +90,14 @@ ESX.RegisterServerCallback('muhaddil-moneywash:getPlayerJob', function(src, cb)
     end
 end)
 
--- Modificar el comando addmoneywash para aceptar un trabajo opcional
+-- Modify the addmoneywash command to accept an optional job
 RegisterCommand('addmoneywash', function(source, args)
     local xPlayer = ESX.GetPlayerFromId(source)
     if xPlayer and xPlayer.getGroup() == 'admin' then
         local ped = GetPlayerPed(source)
         local coords = GetEntityCoords(ped)
         local heading = GetEntityHeading(ped)
-        local job = args[1] -- El primer argumento es el nombre del trabajo opcional
+        local job = args[1] -- optional job argument
 
         local newLocation = {
             coords = { coords.x, coords.y, coords.z },
@@ -110,9 +111,12 @@ RegisterCommand('addmoneywash', function(source, args)
         table.insert(moneywashers, newLocation)
         saveMoneywashers()
         sendMoneywashersAll()
-        TriggerClientEvent('ox_lib:notify', source, { description = 'Ubicación de lavado añadida' .. (job and job ~= '' and ' para el trabajo: ' .. job or ''), type = 'success' })
+        TriggerClientEvent('ox_lib:notify', source,
+            { description = 'Ubicación de lavado añadida' .. (job and job ~= '' and ' para el trabajo: ' .. job or ''), type =
+            'success' })
     else
-         TriggerClientEvent('ox_lib:notify', source, { description = 'No tienes permisos para usar este comando.', type = 'error' })
+        TriggerClientEvent('ox_lib:notify', source,
+            { description = 'No tienes permisos para usar este comando.', type = 'error' })
     end
 end, false)
 
