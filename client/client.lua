@@ -261,6 +261,8 @@ local function OpenSingleMoneywashMenu(index)
         return
     end
 
+    local jobText = v.job and ('🔒 Job: ' .. v.job) or '🔓 Libre'
+
     local options = {
         {
             title = locale('teleport_here'),
@@ -279,6 +281,38 @@ local function OpenSingleMoneywashMenu(index)
                 lib.notify({ description = locale('location_deleted'), type = "success" })
                 Wait(100)
                 OpenMoneywashDeleteMenu()
+            end
+        },
+        {
+            title = locale('change_job'),
+            description = jobText,
+            icon = "briefcase",
+            onSelect = function()
+                local input = lib.inputDialog(locale('change_job'), {
+                    {
+                        type = "input",
+                        label = locale('change_job_desc'),
+                        placeholder = "ej. mafia, police",
+                        default = v.job or ''
+                    }
+                })
+                if input then
+                    TriggerServerEvent('muhaddil-moneywash:updateJob', index, input[1])
+                    Wait(500)
+                    OpenSingleMoneywashMenu(index)
+                end
+            end
+        },
+        {
+            title = locale('change_ubication'),
+            icon = "map-marker",
+            onSelect = function()
+                local coords = GetEntityCoords(PlayerPedId())
+                local heading = GetEntityHeading(PlayerPedId())
+                TriggerServerEvent('muhaddil-moneywash:updateLocation', index, coords, heading)
+                lib.notify({ description = locale('change_ubication_success'), type = "success" })
+                Wait(500)
+                OpenSingleMoneywashMenu(index)
             end
         }
     }
@@ -308,7 +342,7 @@ function OpenMoneywashDeleteMenu()
     for i, v in ipairs(moneywashers) do
         table.insert(options, {
             title = string.format(locale('location_title'), i, v.coords[1], v.coords[2], v.coords[3]),
-            description = string.format(locale('location_heading'), v.heading),
+            description = string.format(locale('location_heading_with_job'), v.heading, v.job),
             icon = "trash",
             onSelect = function()
                 OpenSingleMoneywashMenu(i)

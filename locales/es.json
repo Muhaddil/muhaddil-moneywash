@@ -19,9 +19,13 @@
   "options_for_location": "Opciones para ubicación #%d",
   "no_locations_to_delete": "No hay ubicaciones para eliminar",
   "location_title": "Ubicación #%d (%.2f, %.2f, %.2f)",
-  "location_heading": "Heading: %.2f",
+  "location_heading_with_job": "Heading: %.2f \n Job: %s",
   "delete_locations_title": "Eliminar ubicaciones de lavado",
   "teleported_to_point": "Teletransportado al punto",
   "card-inserting": "Insertando tarjeta...",
-  "not-required-job": "No tienes el trabajo requerido para usar esta ubicación."
+  "not-required-job": "No tienes el trabajo requerido para usar esta ubicación.",
+  "change_job": "Cambiar trabajo",
+  "change_job_desc": "Nombre del job (vacío para desbloquear)",
+  "change_ubication": "Cambiar ubicación",
+  "change_ubication_success": "Ubicación actualizada"
 }

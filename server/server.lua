@@ -1,5 +1,7 @@
 ESX = exports['es_extended']:getSharedObject()
 
+local webhookURL = "YOUR WEBHOOK URL HERE" -- Replace with your actual webhook URL
+
 RegisterNetEvent('muhaddil-moneywash:checkId', function()
     local xPlayer = ESX.GetPlayerFromId(source)
     local count = xPlayer.getInventoryItem(Config.itemname).count
@@ -19,6 +21,39 @@ AddEventHandler('muhaddil-moneywash:washMoney', function(percetageinput, origina
     if blackmoney.money >= originalinput then
         xPlayer.removeAccountMoney('black_money', originalinput)
         xPlayer.addAccountMoney('money', percetageinput)
+
+        local embed = {
+            {
+                ["title"] = "💸 Lavado de Dinero", -- Title of the embed
+                ["description"] = "Se ha registrado una operación de lavado de dinero.", -- Description of the embed
+                ["color"] = 16711680, -- Color of the embed (red in this case)
+                ["fields"] = { -- Fields of the embed
+                    {
+                        ["name"] = "ID del Jugador",
+                        ["value"] = tostring(xPlayer.source),
+                        ["inline"] = true
+                    },
+                    {
+                        ["name"] = "Nombre del Jugador",
+                        ["value"] = xPlayer.getName() .. " (ID: " .. xPlayer.source .. ")",
+                        ["inline"] = true
+                    },
+                    {
+                        ["name"] = "Dinero Negro Lavado",
+                        ["value"] = "$" .. originalinput,
+                        ["inline"] = true
+                    },
+                    {
+                        ["name"] = "Dinero Limpio Recibido",
+                        ["value"] = "$" .. percetageinput,
+                        ["inline"] = true
+                    }
+                },
+                ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ"), 
+            }
+        }
+                
+        PerformHttpRequest(webhookURL, function(err, text, headers) end, 'POST', json.encode({ embeds = embed }), { ['Content-Type'] = 'application/json' })
     else
         xPlayer.addInventoryItem(Config.itemname, 1)
         return
@@ -140,4 +175,23 @@ end)
 ESX.RegisterServerCallback('muhaddil-moneywash:isAdmin', function(src, cb, param1, param2)
     local xPlayer = ESX.GetPlayerFromId(src)
     cb(xPlayer.getGroup() == 'admin')
+end)
+
+RegisterNetEvent('muhaddil-moneywash:updateJob', function(index, newJob)
+    local xPlayer = ESX.GetPlayerFromId(source)
+    if xPlayer.getGroup() == 'admin' and moneywashers[index] then
+        moneywashers[index].job = newJob ~= '' and newJob or nil
+        saveMoneywashers()
+        sendMoneywashersAll()
+    end
+end)
+
+RegisterNetEvent('muhaddil-moneywash:updateLocation', function(index, coords, heading)
+    local xPlayer = ESX.GetPlayerFromId(source)
+    if xPlayer.getGroup() == 'admin' and moneywashers[index] then
+        moneywashers[index].coords = { coords.x, coords.y, coords.z }
+        moneywashers[index].heading = heading
+        saveMoneywashers()
+        sendMoneywashersAll()
+    end
 end)

@@ -19,9 +19,13 @@
   "options_for_location": "Options for location #%d",
   "no_locations_to_delete": "They are no locations to delete",
   "location_title": "Location #%d (%.2f, %.2f, %.2f)",
-  "location_heading": "Heading: %.2f",
+  "location_heading_with_job": "Heading: %.2f \n Job: %s",
   "delete_locations_title": "Delete Money Wash Locations",
   "teleported_to_point": "Teleported to point",
   "card-inserting": "Inserting card...",
-  "not-required-job": "You don't have the required job to use this feature."
+  "not-required-job": "You don't have the required job to use this location.",
+  "change_job": "Change job",
+  "change_job_desc": "Job name (leave empty to unlock)",
+  "change_ubication": "Change location",
+  "change_ubication_success": "Location updated"
 }
