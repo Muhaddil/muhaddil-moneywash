@@ -47,8 +47,9 @@ Edit the `config.lua` file to customize the system:
 
 ## Commands
 
-- `/addmoneywash`
+- `/addmoneywash [job]`
 Adds a new wash location at the player's current position (admin only).
+Input a job to be a job-locked moneywash, if not, it will be public.
 
 - `/delmoneywashmenu`
 Opens the menu to delete wash locations (admin only).

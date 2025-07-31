@@ -1,16 +1,48 @@
 ESX = exports['es_extended']:getSharedObject()
 lib.locale()
 
+local function DebugPrint(printable)
+    if Config.debug then
+        print("[DEBUG] " .. tostring(printable))
+    end
+end
+
+DebugPrint("Money Wash System Loaded - Client")
+
 local alreadymarker = false
 local menuopended = false
 local playerJob = nil
+local moneywashers = {}
 
-RegisterNetEvent("esx:setJob") 
-AddEventHandler('esx:setJob', function(job,lastJob)
+Citizen.CreateThread(function()
+    while ESX == nil do
+        Citizen.Wait(100)
+    end
+    local playerData = ESX.GetPlayerData()
+    if playerData and playerData.job then
+        playerJob = playerData.job.name
+        DebugPrint("Job cargado al iniciar el script: " .. playerJob)
+    else
+        DebugPrint("No se pudo cargar el job al iniciar")
+    end
+end)
+
+RegisterNetEvent('esx:playerLoaded')
+AddEventHandler('esx:playerLoaded', function(playerData)
+    DebugPrint("Player loaded: " .. json.encode(playerData))
+    playerJob = playerData.job.name
+    DebugPrint("Player job set to: " .. tostring(playerJob))
+end)
+
+RegisterNetEvent('esx:setJob')
+AddEventHandler('esx:setJob', function(job)
+    DebugPrint("Job updated: " .. json.encode(job))
     playerJob = job.name
+    DebugPrint("Player job changed to: " .. tostring(playerJob))
 end)
 
 local function showProgress(data)
+    DebugPrint("showProgress called with type: " .. Config.progressType)
     if Config.progressType == "bar" then
         return lib.progressBar(data)
     elseif Config.progressType == "circle" then
@@ -115,7 +147,7 @@ RegisterNetEvent('muhaddil-moneywash:getInput', function ()
     end
 end)
 
-local function openMenu(v) 
+local function openMenu(v)
     local jobRestricted = v.job ~= nil and v.job ~= ''
     local canAccess = true
     if jobRestricted then
@@ -123,7 +155,7 @@ local function openMenu(v)
     end
 
     if not canAccess then
-         lib.notify({
+        lib.notify({
             title = locale('moneywash_title'),
             description = locale("not-required-job"),
             type = 'error'
@@ -139,7 +171,7 @@ local function openMenu(v)
                 title = locale('insert_card'),
                 description = locale('insert_card_desc'),
                 icon = 'id-card',
-                onSelect = function ()
+                onSelect = function()
                     TriggerServerEvent('muhaddil-moneywash:checkId')
                     SetEntityHeading(PlayerPedId(), v.heading)
                 end
@@ -149,17 +181,21 @@ local function openMenu(v)
     lib.showContext('moneywash')
 end
 
-local moneywashers = {}
-
 RegisterNetEvent('muhaddil-moneywash:setMoneywashers', function(zones)
+    DebugPrint("Received moneywash zones: " .. json.encode(zones))
     moneywashers = zones or {}
 end)
 
 Citizen.CreateThread(function()
+    DebugPrint("Requesting moneywash zones from server")
     TriggerServerEvent('muhaddil-moneywash:requestMoneywashers')
 end)
 
 Citizen.CreateThread(function()
+    while playerJob == nil do
+        Wait(100)
+    end
+
     while true do
         local inmarker = false
         local sleep = 1000
@@ -171,7 +207,7 @@ Citizen.CreateThread(function()
 
             local canAccess = true
             if jobRestricted then
-                canAccess = (playerJob == v.job)
+                canAccess = (string.lower(playerJob or "") == string.lower(v.job or ""))
             end
 
             if canAccess then
@@ -179,6 +215,11 @@ Citizen.CreateThread(function()
                 if zonecoords < 2 then
                     sleep = 0
                     inmarker = true
+                    if menuopended and lib.getOpenContextMenu() == nil then
+                        DebugPrint("Context menu cerrado, reseteando menuopended")
+                        menuopended = false
+                    end
+
                     if not menuopended and IsControlJustPressed(0, 38) then
                         openMenu(v)
                         menuopended = true
@@ -189,7 +230,7 @@ Citizen.CreateThread(function()
                         0.0, 0.0, 0.0,
                         0.0, 0.0, 0.0,
                         0.3, 0.3, 0.3,
-                        0, 0, 0, 150,
+                        0, 0, 0, 255, -- Pure black (red: integer, green: integer, blue: integer, alpha: integer max 255)
                         false, true, 2, false, nil, nil, false
                     )
                 end
@@ -252,6 +293,8 @@ local function OpenSingleMoneywashMenu(index)
 end
 
 function OpenMoneywashDeleteMenu()
+    DebugPrint("OpenMoneywashDeleteMenu called")
+
     if #moneywashers == 0 then
         lib.notify({
             description = locale('no_locations_to_delete'),
@@ -283,7 +326,7 @@ function OpenMoneywashDeleteMenu()
 end
 
 RegisterCommand('delmoneywashmenu', function()
-    ESX.TriggerServerCallback('muhaddil-ilegalmedic:isAdmin', function(isAdmin)
+    ESX.TriggerServerCallback('muhaddil-moneywash:isAdmin', function(isAdmin)
         if isAdmin then
             OpenMoneywashDeleteMenu()
         end
