@@ -196,6 +196,8 @@ Citizen.CreateThread(function()
         Wait(100)
     end
 
+    local TextUIShown = false
+
     while true do
         local inmarker = false
         local sleep = 1000
@@ -204,8 +206,8 @@ Citizen.CreateThread(function()
 
         for k, v in pairs(moneywashers) do
             local jobRestricted = v.job ~= nil and v.job ~= ''
-
             local canAccess = true
+
             if jobRestricted then
                 canAccess = (string.lower(playerJob or "") == string.lower(v.job or ""))
             end
@@ -215,6 +217,7 @@ Citizen.CreateThread(function()
                 if zonecoords < 2 then
                     sleep = 0
                     inmarker = true
+
                     if menuopended and lib.getOpenContextMenu() == nil then
                         DebugPrint("Context menu cerrado, reseteando menuopended")
                         menuopended = false
@@ -224,6 +227,7 @@ Citizen.CreateThread(function()
                         openMenu(v)
                         menuopended = true
                     end
+
                     DrawMarker(
                         20,
                         v.coords[1], v.coords[2], v.coords[3],
@@ -239,13 +243,19 @@ Citizen.CreateThread(function()
 
         if inmarker and not alreadymarker then
             alreadymarker = true
+            TextUIShown = true
             lib.showTextUI(locale('access_text'))
         end
+
         if not inmarker and alreadymarker then
             alreadymarker = false
             menuopended = false
-            lib.hideTextUI()
+            if TextUIShown then
+                lib.hideTextUI()
+                TextUIShown = false
+            end
         end
+
         Wait(sleep)
     end
 end)
