@@ -3,21 +3,29 @@ game 'gta5'
 lua54 'yes'
 
 author 'Muhaddil'
-description 'Simple Money Wash System'
-version 'v1.0.31'
+description 'Money Wash System'
+version 'v2.0.0'
 
 shared_script 'config.lua'
 
-client_script {
+client_scripts {
     'client/*'
 }
 
-server_script {
-    'server/*'
+server_scripts {
+    'server/*',
 }
 
 shared_script '@ox_lib/init.lua'
 
+ui_page 'html/index.html'
+
 files {
-    'locales/*.json'
+    'locales/*.json',
+    'html/*'
+}
+
+dependencies {
+    'es_extended',
+    'ox_lib'
 }

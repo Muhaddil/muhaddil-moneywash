@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Money Wash UI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background: transparent;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            overflow: hidden;
+            background: transparent;
+        }
+
+        @keyframes slide-in {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .animate-slide-in {
+            animation: slide-in 0.3s ease-out;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="moneyWashUI" class="hidden fixed inset-0 flex items-center justify-center z-50 p-4">
+        <div
+            class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl shadow-2xl w-full max-w-2xl border border-slate-700">
+            <div
+                class="bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-t-2xl p-6 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="bg-white/20 p-2 rounded-lg">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                            </path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Money Wash System</h2>
+                        <p class="text-emerald-100 text-sm">Sistema de Lavado de Dinero</p>
+                    </div>
+                </div>
+                <button id="closeButton" class="bg-white/20 hover:bg-white/30 p-2 rounded-lg transition-all">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+            <div id="washingProgress" class="hidden bg-slate-800 px-6 py-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-white font-medium">Lavando dinero...</span>
+                    <span id="progressPercent" class="text-emerald-400 font-bold">0%</span>
+                </div>
+                <div class="w-full bg-slate-700 rounded-full h-3 overflow-hidden">
+                    <div id="progressBar"
+                        class="bg-gradient-to-r from-emerald-500 to-emerald-600 h-full transition-all duration-300 rounded-full"
+                        style="width: 0%"></div>
+                </div>
+            </div>
+            <div class="p-6">
+                <div id="mainView">
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div
+                                class="bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 rounded-xl p-4 border border-emerald-500/30">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="text-emerald-400">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                            </path>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="text-slate-400 text-xs mb-1">Total Lavado</div>
+                                <div id="totalWashed" class="text-white text-xl font-bold">$0</div>
+                            </div>
+                            <div
+                                class="bg-gradient-to-br from-blue-500/20 to-blue-600/10 rounded-xl p-4 border border-blue-500/30">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="text-blue-400">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                                            </path>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="text-slate-400 text-xs mb-1">Transacciones</div>
+                                <div id="totalTransactions" class="text-white text-xl font-bold">0</div>
+                            </div>
+                            <div
+                                class="bg-gradient-to-br from-purple-500/20 to-purple-600/10 rounded-xl p-4 border border-purple-500/30">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="text-purple-400">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="text-slate-400 text-xs mb-1">Éxito</div>
+                                <div id="successRate" class="text-white text-xl font-bold">0%</div>
+                            </div>
+                            <div
+                                class="bg-gradient-to-br from-amber-500/20 to-amber-600/10 rounded-xl p-4 border border-amber-500/30">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="text-amber-400">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z">
+                                            </path>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="text-slate-400 text-xs mb-1">Reputación</div>
+                                <div id="reputation" class="text-white text-xl font-bold">0/100</div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button id="washButton"
+                                class="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                    </path>
+                                </svg>
+                                Lavar Dinero
+                            </button>
+                            <button id="statsButton"
+                                class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                                    </path>
+                                </svg>
+                                Estadísticas
+                            </button>
+                            <button id="historyButton"
+                                class="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Historial
+                            </button>
+                            <button id="adminButton"
+                                class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2 hidden">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                                    </path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                Admin
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="washView" class="hidden space-y-4">
+                    <div class="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
+                        <h3 class="text-lg font-semibold text-white mb-4">Método de Lavado</h3>
+                        <div class="grid grid-cols-3 gap-3 mb-6">
+                            <button id="standardMethod"
+                                class="py-3 px-4 rounded-lg font-medium transition-all bg-emerald-500 text-white shadow-lg">Estándar</button>
+                            <button id="fastMethod"
+                                class="py-3 px-4 rounded-lg font-medium transition-all bg-slate-700 text-slate-300 hover:bg-slate-600">Rápido</button>
+                            <button id="secureMethod"
+                                class="py-3 px-4 rounded-lg font-medium transition-all bg-slate-700 text-slate-300 hover:bg-slate-600">Seguro</button>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Cantidad de Dinero
+                                Negro</label>
+                            <div class="relative">
+                                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                    </path>
+                                </svg>
+                                <input type="number" id="amountInput"
+                                    class="w-full pl-10 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                    placeholder="Introduce la cantidad...">
+                            </div>
+                        </div>
+                        <div id="washCalculation" class="hidden bg-slate-900/50 rounded-lg p-4 mb-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-slate-400">Cantidad a lavar:</span>
+                                <span id="washAmount" class="text-white font-semibold"></span>
+                            </div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-slate-400">Comisión (~25%):</span>
+                                <span id="commissionAmount" class="text-red-400 font-semibold"></span>
+                            </div>
+                            <div class="flex justify-between items-center pt-2 border-t border-slate-700">
+                                <span class="text-slate-300 font-semibold">Recibirás:</span>
+                                <span id="cleanAmount" class="text-emerald-400 font-bold text-lg"></span>
+                            </div>
+                            <div class="flex justify-between items-center mt-2">
+                                <span class="text-slate-400 text-sm">Tiempo estimado:</span>
+                                <span id="estimatedTime" class="text-blue-400 text-sm"></span>
+                            </div>
+                        </div>
+                        <button id="startWashButton"
+                            class="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg">
+                            Iniciar Lavado
+                        </button>
+                    </div>
+                    <button id="backFromWash"
+                        class="w-full bg-slate-700 hover:bg-slate-600 text-white font-medium py-3 px-6 rounded-lg transition-all">
+                        Volver
+                    </button>
+                </div>
+                <div id="statsView" class="hidden space-y-4">
+                    <div
+                        class="bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-xl p-6 border border-blue-500/30">
+                        <h3 class="text-xl font-bold text-white mb-4">Nivel de Reputación</h3>
+                        <div class="relative pt-1">
+                            <div class="flex mb-2 items-center justify-between">
+                                <div>
+                                    <span id="reputationLevel"
+                                        class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-200 bg-blue-900">Novato</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-xs font-semibold inline-block text-blue-200"
+                                        id="reputationPercent">0%</span>
+                                </div>
+                            </div>
+                            <div class="overflow-hidden h-3 mb-4 text-xs flex rounded-full bg-slate-700">
+                                <div id="reputationBar"
+                                    class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-500"
+                                    style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+                            <div class="text-slate-400 text-sm mb-1">Total Lavado</div>
+                            <div class="text-2xl font-bold text-emerald-400" id="statsTotalWashed">$0</div>
+                        </div>
+                        <div class="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+                            <div class="text-slate-400 text-sm mb-1">Transacciones</div>
+                            <div class="text-2xl font-bold text-blue-400" id="statsTotalTransactions">0</div>
+                        </div>
+                        <div class="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+                            <div class="text-slate-400 text-sm mb-1">Tasa de Éxito</div>
+                            <div class="text-2xl font-bold text-purple-400" id="statsSuccessRate">0%</div>
+                        </div>
+                        <div class="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+                            <div class="text-slate-400 text-sm mb-1">Promedio</div>
+                            <div class="text-2xl font-bold text-amber-400" id="statsAverage">$0</div>
+                        </div>
+                    </div>
+                    <button id="backFromStats"
+                        class="w-full bg-slate-700 hover:bg-slate-600 text-white font-medium py-3 px-6 rounded-lg transition-all">Volver</button>
+                </div>
+                <div id="historyView" class="hidden space-y-4">
+                    <div class="bg-slate-800/50 rounded-xl border border-slate-700 max-h-96 overflow-y-auto">
+                        <div class="divide-y divide-slate-700" id="historyContainer">
+                        </div>
+                    </div>
+                    <button id="backFromHistory"
+                        class="w-full bg-slate-700 hover:bg-slate-600 text-white font-medium py-3 px-6 rounded-lg transition-all">Volver</button>
+                </div>
+                <div id="adminView" class="hidden space-y-4">
+                    <div class="bg-slate-800/50 rounded-xl border border-slate-700 max-h-96 overflow-y-auto">
+                        <div class="divide-y divide-slate-700" id="locationsContainer">
+                        </div>
+                    </div>
+                    <button id="backFromAdmin"
+                        class="w-full bg-slate-700 hover:bg-slate-600 text-white font-medium py-3 px-6 rounded-lg transition-all">Volver</button>
+                </div>
+            </div>
+            <div id="notification" class="hidden absolute top-20 right-6 animate-slide-in">
+                <div class="rounded-lg p-4 shadow-lg border bg-emerald-500 border-emerald-600">
+                    <div class="flex items-center gap-2 text-white">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span id="notificationMessage" class="font-medium">Proceso iniciado correctamente</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const state = {
+            isVisible: false,
+            currentView: 'main',
+            amount: '',
+            washing: false,
+            progress: 0,
+            stats: {
+                totalWashed: 0,
+                totalTransactions: 0,
+                successRate: 0,
+                reputation: 0,
+                reputationLevel: 'Novato'
+            },
+            history: [],
+            locations: [],
+            washMethod: 'standard',
+            config: {
+                limits: {},
+                economy: {},
+                reputation: {},
+                washMethods: {
+                    standard: {
+                        name: "Estándar",
+                        speedMultiplier: 1.0,
+                        successBonus: 0,
+                        minAmount: 1000,
+                        maxAmount: 1000000
+                    },
+                    fast: {
+                        name: "Rápido",
+                        speedMultiplier: 0.5,
+                        successBonus: -10,
+                        minAmount: 5000,
+                        maxAmount: 500000
+                    },
+                    secure: {
+                        name: "Seguro",
+                        speedMultiplier: 1.5,
+                        successBonus: 5,
+                        minAmount: 10000,
+                        maxAmount: 2000000
+                    }
+                }
+            }
+        };
+
+        const elements = {
+            moneyWashUI: document.getElementById('moneyWashUI'),
+            closeButton: document.getElementById('closeButton'),
+            washingProgress: document.getElementById('washingProgress'),
+            progressPercent: document.getElementById('progressPercent'),
+            progressBar: document.getElementById('progressBar'),
+
+            mainView: document.getElementById('mainView'),
+            washView: document.getElementById('washView'),
+            statsView: document.getElementById('statsView'),
+            historyView: document.getElementById('historyView'),
+            adminView: document.getElementById('adminView'),
+
+            washButton: document.getElementById('washButton'),
+            statsButton: document.getElementById('statsButton'),
+            historyButton: document.getElementById('historyButton'),
+            adminButton: document.getElementById('adminButton'),
+
+            backFromWash: document.getElementById('backFromWash'),
+            backFromStats: document.getElementById('backFromStats'),
+            backFromHistory: document.getElementById('backFromHistory'),
+            backFromAdmin: document.getElementById('backFromAdmin'),
+
+            standardMethod: document.getElementById('standardMethod'),
+            fastMethod: document.getElementById('fastMethod'),
+            secureMethod: document.getElementById('secureMethod'),
+            amountInput: document.getElementById('amountInput'),
+            washCalculation: document.getElementById('washCalculation'),
+            washAmount: document.getElementById('washAmount'),
+            commissionAmount: document.getElementById('commissionAmount'),
+            cleanAmount: document.getElementById('cleanAmount'),
+            estimatedTime: document.getElementById('estimatedTime'),
+            startWashButton: document.getElementById('startWashButton'),
+
+            totalWashed: document.getElementById('totalWashed'),
+            totalTransactions: document.getElementById('totalTransactions'),
+            successRate: document.getElementById('successRate'),
+            reputation: document.getElementById('reputation'),
+            reputationLevel: document.getElementById('reputationLevel'),
+            reputationBar: document.getElementById('reputationBar'),
+            statsTotalWashed: document.getElementById('statsTotalWashed'),
+            statsTotalTransactions: document.getElementById('statsTotalTransactions'),
+            statsSuccessRate: document.getElementById('statsSuccessRate'),
+            statsAverage: document.getElementById('statsAverage'),
+            reputationPercent: document.getElementById('reputationPercent'),
+
+            historyContainer: document.getElementById('historyContainer'),
+            locationsContainer: document.getElementById('locationsContainer'),
+
+            notification: document.getElementById('notification'),
+            notificationMessage: document.getElementById('notificationMessage')
+        };
+
+        function checkAdminStatus() {
+            fetch(`https://muhaddil-moneywash/isAdmin`, {
+                method: 'POST',
+                body: JSON.stringify({})
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.isAdmin) {
+                        elements.adminButton.classList.remove('hidden');
+                    } else {
+                        elements.adminButton.classList.add('hidden');
+                    }
+                })
+                .catch(() => {
+                    elements.adminButton.classList.add('hidden');
+                });
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = elements.notification;
+            const messageEl = elements.notificationMessage;
+
+            messageEl.textContent = message;
+
+            const container = notification.querySelector('div');
+            container.className = 'rounded-lg p-4 shadow-lg border ';
+
+            if (type === 'success') {
+                container.classList.add('bg-emerald-500', 'border-emerald-600');
+            } else if (type === 'error') {
+                container.classList.add('bg-red-500', 'border-red-600');
+            } else {
+                container.classList.add('bg-blue-500', 'border-blue-600');
+            }
+
+            notification.classList.remove('hidden');
+            setTimeout(() => {
+                notification.classList.add('hidden');
+            }, 3000);
+        }
+
+        function animateProgress(duration) {
+            let current = 0;
+            const totalSteps = duration * 20;
+            const stepTime = 50;
+            const increment = 100 / totalSteps;
+
+            const interval = setInterval(() => {
+                current += increment;
+                if (current >= 100) {
+                    current = 100;
+                    clearInterval(interval);
+                    state.washing = false;
+                    updateProgress(current);
+                    elements.washingProgress.classList.add('hidden');
+                    showNotification('Lavado completado', 'success');
+                } else {
+                    updateProgress(Math.floor(current));
+                }
+            }, stepTime);
+        }
+
+        function updateProgress(percent) {
+            state.progress = percent;
+            elements.progressPercent.textContent = `${Math.floor(percent)}%`;
+            elements.progressBar.style.width = `${percent}%`;
+        }
+
+        function updateStatsDisplay() {
+            elements.totalWashed.textContent = `$${state.stats.totalWashed.toLocaleString()}`;
+            elements.totalTransactions.textContent = state.stats.totalTransactions;
+            elements.successRate.textContent = `${state.stats.successRate}%`;
+            elements.reputation.textContent = `${state.stats.reputation}/100`;
+            elements.reputationLevel.textContent = state.stats.reputationLevel;
+            elements.reputationBar.style.width = `${state.stats.reputation}%`;
+            elements.reputationPercent.textContent = `${state.stats.reputation}%`;
+
+            elements.statsTotalWashed.textContent = `$${state.stats.totalWashed.toLocaleString()}`;
+            elements.statsTotalTransactions.textContent = state.stats.totalTransactions;
+            elements.statsSuccessRate.textContent = `${state.stats.successRate}%`;
+            elements.statsAverage.textContent = `$${state.stats.totalTransactions > 0 ? Math.floor(state.stats.totalWashed / state.stats.totalTransactions).toLocaleString() : 0}`;
+        }
+
+        function updateWashCalculation() {
+            const amount = parseInt(state.amount);
+            if (amount > 0) {
+                const washMethods = state.config.washMethods || {
+                    standard: {
+                        name: "Estándar",
+                        speedMultiplier: 1.0,
+                        successBonus: 0,
+                        minAmount: 1000,
+                        maxAmount: 1000000
+                    },
+                    fast: {
+                        name: "Rápido",
+                        speedMultiplier: 0.5,
+                        successBonus: -10,
+                        minAmount: 5000,
+                        maxAmount: 500000
+                    },
+                    secure: {
+                        name: "Seguro",
+                        speedMultiplier: 1.5,
+                        successBonus: 5,
+                        minAmount: 10000,
+                        maxAmount: 2000000
+                    }
+                };
+
+                const methodConfig = washMethods[state.washMethod] || washMethods.standard;
+                const baseCommission = 25;
+                const commissionAdjustment = methodConfig.successBonus;
+                const commission = Math.max(10, Math.min(40, baseCommission + commissionAdjustment));
+
+                const cleanAmount = Math.floor(amount - (amount * commission / 100));
+                const baseTime = Math.max(1, Math.floor(amount * 0.002));
+                const estimatedTime = Math.floor(baseTime * methodConfig.speedMultiplier);
+
+                elements.washAmount.textContent = `$${amount.toLocaleString()}`;
+                elements.commissionAmount.textContent = `-$${Math.floor(amount * commission / 100).toLocaleString()}`;
+                elements.cleanAmount.textContent = `$${cleanAmount.toLocaleString()}`;
+                elements.estimatedTime.textContent = `${estimatedTime}s`;
+
+                elements.washCalculation.classList.remove('hidden');
+            } else {
+                elements.washCalculation.classList.add('hidden');
+            }
+        }
+
+        function updateWashMethodButtons() {
+            elements.standardMethod.className = 'py-3 px-4 rounded-lg font-medium transition-all bg-slate-700 text-slate-300 hover:bg-slate-600';
+            elements.fastMethod.className = 'py-3 px-4 rounded-lg font-medium transition-all bg-slate-700 text-slate-300 hover:bg-slate-600';
+            elements.secureMethod.className = 'py-3 px-4 rounded-lg font-medium transition-all bg-slate-700 text-slate-300 hover:bg-slate-600';
+
+            if (state.washMethod === 'standard') {
+                elements.standardMethod.className = 'py-3 px-4 rounded-lg font-medium transition-all bg-emerald-500 text-white shadow-lg';
+            } else if (state.washMethod === 'fast') {
+                elements.fastMethod.className = 'py-3 px-4 rounded-lg font-medium transition-all bg-emerald-500 text-white shadow-lg';
+            } else if (state.washMethod === 'secure') {
+                elements.secureMethod.className = 'py-3 px-4 rounded-lg font-medium transition-all bg-emerald-500 text-white shadow-lg';
+            }
+        }
+
+        function showView(viewName) {
+            elements.mainView.classList.add('hidden');
+            elements.washView.classList.add('hidden');
+            elements.statsView.classList.add('hidden');
+            elements.historyView.classList.add('hidden');
+            elements.adminView.classList.add('hidden');
+
+            if (viewName === 'main') {
+                elements.mainView.classList.remove('hidden');
+            } else if (viewName === 'wash') {
+                elements.washView.classList.remove('hidden');
+            } else if (viewName === 'stats') {
+                elements.statsView.classList.remove('hidden');
+            } else if (viewName === 'history') {
+                elements.historyView.classList.remove('hidden');
+                updateHistoryDisplay();
+            } else if (viewName === 'admin') {
+                elements.adminView.classList.remove('hidden');
+                updateLocationsDisplay();
+            }
+
+            state.currentView = viewName;
+        }
+
+        function handleClose() {
+            state.isVisible = false;
+            elements.moneyWashUI.classList.add('hidden');
+            fetch(`https://muhaddil-moneywash/closeUI`, {
+                method: 'POST',
+                body: JSON.stringify({})
+            }).catch(() => { });
+        }
+
+        function handleWash() {
+            if (!state.amount || state.amount <= 0) {
+                showNotification('Introduce una cantidad válida', 'error');
+                return;
+            }
+            const washMethods = state.config.washMethods || {
+                standard: {
+                    name: "Estándar",
+                    speedMultiplier: 1.0,
+                    successBonus: 0,
+                    minAmount: 1000,
+                    maxAmount: 1000000
+                },
+                fast: {
+                    name: "Rápido",
+                    speedMultiplier: 0.5,
+                    successBonus: -10,
+                    minAmount: 5000,
+                    maxAmount: 500000
+                },
+                secure: {
+                    name: "Seguro",
+                    speedMultiplier: 1.5,
+                    successBonus: 5,
+                    minAmount: 10000,
+                    maxAmount: 2000000
+                }
+            };
+            const methodConfig = washMethods[state.washMethod] || washMethods.standard;
+            const baseTime = Math.max(1, Math.floor(state.amount * 0.002));
+            const duration = Math.floor(baseTime * methodConfig.speedMultiplier);
+            fetch(`https://muhaddil-moneywash/startWash`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    amount: parseInt(state.amount),
+                    method: state.washMethod
+                })
+            }).catch(() => { });
+            state.washing = true;
+            elements.washingProgress.classList.remove('hidden');
+            animateProgress(duration);
+            showView('main');
+            showNotification('Iniciando proceso de lavado...', 'success');
+        }
+
+        function updateHistoryDisplay() {
+            const container = elements.historyContainer;
+            container.innerHTML = '';
+
+            state.history.forEach(transaction => {
+                const successClass = transaction.success ? 'text-emerald-400' : 'text-red-400';
+                const successText = transaction.success ? `+$${transaction.cleanAmount.toLocaleString()}` : 'Fallido';
+
+                const transactionElement = document.createElement('div');
+                transactionElement.className = 'p-4 hover:bg-slate-700/50 transition-colors';
+                transactionElement.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-5 h-5 ${successClass}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span class="text-white font-medium">$${transaction.amount.toLocaleString()}</span>
+                        </div>
+                        <span class="text-xs text-slate-400">${transaction.time}</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-slate-400">Método: ${transaction.method}</span>
+                        <span class="${successClass}">${successText}</span>
+                    </div>
+                `;
+                container.appendChild(transactionElement);
+            });
+        }
+
+        function updateLocationsDisplay() {
+            const container = elements.locationsContainer;
+            container.innerHTML = '';
+
+            state.locations.forEach((location, index) => {
+                const locationElement = document.createElement('div');
+                locationElement.className = 'p-4 hover:bg-slate-700/50 transition-colors';
+                locationElement.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <div class="text-white font-medium mb-1">Ubicación #${index + 1}</div>
+                            <div class="text-xs text-slate-400">${location.coords.join(', ')}</div>
+                            ${location.job ? `<div class="flex items-center gap-1 mt-1">
+                                <svg class="w-3 h-3 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                </svg>
+                                <span class="text-xs text-amber-400">${location.job}</span>
+                            </div>` : ''}
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button data-index="${index}" class="location-tp flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm py-2 px-3 rounded-lg transition-all flex items-center justify-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                            </svg>
+                            TP
+                        </button>
+                        <button data-index="${index}" class="location-update flex-1 bg-amber-600 hover:bg-amber-700 text-white text-sm py-2 px-3 rounded-lg transition-all flex items-center justify-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            Actualizar
+                        </button>
+                        <button data-index="${index}" class="location-delete flex-1 bg-red-600 hover:bg-red-700 text-white text-sm py-2 px-3 rounded-lg transition-all flex items-center justify-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                            Eliminar
+                        </button>
+                    </div>
+                `;
+                container.appendChild(locationElement);
+            });
+
+            document.querySelectorAll('.location-tp').forEach(button => {
+                button.addEventListener('click', () => {
+                    const index = button.getAttribute('data-index');
+                    fetch(`https://muhaddil-moneywash/teleportTo`, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            index: parseInt(index)
+                        })
+                    }).catch(() => { });
+                });
+            });
+
+            document.querySelectorAll('.location-update').forEach(button => {
+                button.addEventListener('click', () => {
+                    const index = button.getAttribute('data-index');
+                    fetch(`https://muhaddil-moneywash/updateLocation`, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            index: parseInt(index)
+                        })
+                    }).catch(() => { });
+                });
+            });
+
+            document.querySelectorAll('.location-delete').forEach(button => {
+                button.addEventListener('click', () => {
+                    const index = button.getAttribute('data-index');
+                    fetch(`https://muhaddil-moneywash/deleteLocation`, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            index: parseInt(index)
+                        })
+                    }).catch(() => { });
+                });
+            });
+        }
+
+        function init() {
+            elements.closeButton.addEventListener('click', handleClose);
+
+            elements.washButton.addEventListener('click', () => showView('wash'));
+            elements.statsButton.addEventListener('click', () => showView('stats'));
+            elements.historyButton.addEventListener('click', () => showView('history'));
+            elements.adminButton.addEventListener('click', () => showView('admin'));
+
+            elements.backFromWash.addEventListener('click', () => showView('main'));
+            elements.backFromStats.addEventListener('click', () => showView('main'));
+            elements.backFromHistory.addEventListener('click', () => showView('main'));
+            elements.backFromAdmin.addEventListener('click', () => showView('main'));
+
+            elements.standardMethod.addEventListener('click', () => {
+                state.washMethod = 'standard';
+                updateWashMethodButtons();
+                updateWashCalculation();
+            });
+
+            elements.fastMethod.addEventListener('click', () => {
+                state.washMethod = 'fast';
+                updateWashMethodButtons();
+                updateWashCalculation();
+            });
+
+            elements.secureMethod.addEventListener('click', () => {
+                state.washMethod = 'secure';
+                updateWashMethodButtons();
+                updateWashCalculation();
+            });
+
+
+            elements.amountInput.addEventListener('input', (e) => {
+                state.amount = e.target.value;
+                updateWashCalculation();
+            });
+
+            elements.startWashButton.addEventListener('click', handleWash);
+
+            window.addEventListener('message', (event) => {
+                const { action, data } = event.data;
+
+                switch (action) {
+                    case 'openUI':
+                        state.isVisible = true;
+                        elements.moneyWashUI.classList.remove('hidden');
+                        showView('main');
+                        break;
+                    case 'closeUI':
+                        state.isVisible = false;
+                        elements.moneyWashUI.classList.add('hidden');
+                        break;
+                    case 'updateStats':
+                        state.stats = data;
+                        updateStatsDisplay();
+                        break;
+                    case 'updateHistory':
+                        state.history = data;
+                        if (state.currentView === 'history') {
+                            updateHistoryDisplay();
+                        }
+                        break;
+                    case 'updateLocations':
+                        state.locations = data;
+                        if (state.currentView === 'admin') {
+                            updateLocationsDisplay();
+                        }
+                        break;
+                    case 'updateConfig':
+                        state.config = data;
+                        break;
+                    case 'showNotification':
+                        showNotification(data.message, data.type);
+                        break;
+                    case 'startProgress':
+                        state.washing = true;
+                        elements.washingProgress.classList.remove('hidden');
+                        animateProgress(data.duration);
+                        break;
+                    case 'setAdminStatus':
+                        if (data.isAdmin) {
+                            elements.adminButton.classList.remove('hidden');
+                        } else {
+                            elements.adminButton.classList.add('hidden');
+                        }
+                        break;
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            init();
+            checkAdminStatus();
+        });
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape' && state.isVisible) {
+                handleClose();
+            }
+        });
+    </script>
+</body>
+
+</html>
