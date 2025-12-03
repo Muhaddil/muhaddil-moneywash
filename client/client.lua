@@ -392,7 +392,18 @@ end, false)
 RegisterCommand(Config.commands.addLocation or 'addmoneywash', function(source, args)
     ESX.TriggerServerCallback('muhaddil-moneywash:isAdmin', function(isAdmin)
         if isAdmin then
+
             local job = args[1] or nil
+
+            if not Config.permissions.allowMoneyWashersWithoutJobs and not job then
+                lib.notify({
+                    title = locale('moneywash_title'),
+                    description = 'Debes indicar un trabajo para este punto de lavado.',
+                    type = 'error'
+                })
+                return
+            end
+
             local ped = PlayerPedId()
             local coords = GetEntityCoords(ped)
             local heading = GetEntityHeading(ped)
@@ -401,7 +412,7 @@ RegisterCommand(Config.commands.addLocation or 'addmoneywash', function(source, 
 
             lib.notify({
                 title = locale('moneywash_title'),
-                description = 'Ubicación añadida exitosamente' .. (job and ' para el trabajo: ' .. job or ''),
+                description = 'Ubicación añadida exitosamente' .. (job and (' para el trabajo: ' .. job) or ''),
                 type = 'success'
             })
         else

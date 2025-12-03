@@ -182,7 +182,8 @@ Config.commands = {
 Config.permissions = {
     adminGroups = { 'admin', 'superadmin' },
 
-    allowPlayerStats = true
+    allowPlayerStats = true,
+    allowMoneyWashersWithoutJobs = true -- Permite crear puntos de lavado de dinero sin necesidad de un trabajo
 }
 
 function Config.GetCommissionPercentage()
