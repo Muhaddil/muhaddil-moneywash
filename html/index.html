@@ -185,11 +185,22 @@
                         <h3 class="text-lg font-semibold text-white mb-4">Método de Lavado</h3>
                         <div class="grid grid-cols-3 gap-3 mb-6">
                             <button id="standardMethod"
-                                class="py-3 px-4 rounded-lg font-medium transition-all bg-emerald-500 text-white shadow-lg">Estándar</button>
+                                class="py-3 px-4 rounded-lg font-medium transition-all bg-emerald-500 text-white shadow-lg flex flex-col items-center">
+                                <span class="font-bold">Estándar</span>
+                                <!-- <span class="text-xs mt-1 opacity-80" id="standardInfo">Velocidad: 1.0x | Éxito:
+                                    +0%</span> -->
+                            </button>
                             <button id="fastMethod"
-                                class="py-3 px-4 rounded-lg font-medium transition-all bg-slate-700 text-slate-300 hover:bg-slate-600">Rápido</button>
+                                class="py-3 px-4 rounded-lg font-medium transition-all bg-slate-700 text-slate-300 hover:bg-slate-600 flex flex-col items-center">
+                                <span class="font-bold">Rápido</span>
+                                <!-- <span class="text-xs mt-1 opacity-80" id="fastInfo">Velocidad: 0.5x | Éxito: -10%</span> -->
+                            </button>
                             <button id="secureMethod"
-                                class="py-3 px-4 rounded-lg font-medium transition-all bg-slate-700 text-slate-300 hover:bg-slate-600">Seguro</button>
+                                class="py-3 px-4 rounded-lg font-medium transition-all bg-slate-700 text-slate-300 hover:bg-slate-600 flex flex-col items-center">
+                                <span class="font-bold">Seguro</span>
+                                <!-- <span class="text-xs mt-1 opacity-80" id="secureInfo">Velocidad: 1.5x | Éxito:
+                                    +5%</span> -->
+                            </button>
                         </div>
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-slate-300 mb-2">Cantidad de Dinero
@@ -212,8 +223,16 @@
                                 <span id="washAmount" class="text-white font-semibold"></span>
                             </div>
                             <div class="flex justify-between items-center mb-2">
-                                <span class="text-slate-400">Comisión (~25%):</span>
+                                <span class="text-slate-400">Comisión:</span>
                                 <span id="commissionAmount" class="text-red-400 font-semibold"></span>
+                            </div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-slate-400 text-sm">Probabilidad de éxito:</span>
+                                <span id="successChance" class="text-purple-400 text-sm font-semibold"></span>
+                            </div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-slate-400 text-sm">Alerta policial (éxito/fallo):</span>
+                                <span id="policeAlert" class="text-yellow-400 text-sm font-semibold"></span>
                             </div>
                             <div class="flex justify-between items-center pt-2 border-t border-slate-700">
                                 <span class="text-slate-300 font-semibold">Recibirás:</span>
@@ -386,7 +405,12 @@
             commissionAmount: document.getElementById('commissionAmount'),
             cleanAmount: document.getElementById('cleanAmount'),
             estimatedTime: document.getElementById('estimatedTime'),
+            successChance: document.getElementById('successChance'),
+            policeAlert: document.getElementById('policeAlert'),
             startWashButton: document.getElementById('startWashButton'),
+            standardInfo: document.getElementById('standardInfo'),
+            fastInfo: document.getElementById('fastInfo'),
+            secureInfo: document.getElementById('secureInfo'),
 
             totalWashed: document.getElementById('totalWashed'),
             totalTransactions: document.getElementById('totalTransactions'),
@@ -462,7 +486,6 @@
                     state.washing = false;
                     updateProgress(current);
                     elements.washingProgress.classList.add('hidden');
-                    showNotification('Lavado completado', 'success');
                 } else {
                     updateProgress(Math.floor(current));
                 }
@@ -522,14 +545,30 @@
                 const commissionAdjustment = methodConfig.successBonus;
                 const commission = Math.max(10, Math.min(40, baseCommission + commissionAdjustment));
 
+                // Calculate success chance (base 95% + method bonus + reputation bonus)
+                const baseSuccessChance = 95;
+                const reputationBonus = state.stats.reputation ? (state.stats.reputation * 0.05) : 0;
+                const successChance = Math.max(0, Math.min(100, baseSuccessChance + methodConfig.successBonus + reputationBonus));
+
+                // Police alert chances from config
+                const policeConfig = state.config.police || { alertChanceSuccess: 5, alertChanceFail: 30 };
+
                 const cleanAmount = Math.floor(amount - (amount * commission / 100));
                 const baseTime = Math.max(1, Math.floor(amount * 0.002));
                 const estimatedTime = Math.floor(baseTime * methodConfig.speedMultiplier);
 
                 elements.washAmount.textContent = `$${amount.toLocaleString()}`;
-                elements.commissionAmount.textContent = `-$${Math.floor(amount * commission / 100).toLocaleString()}`;
+                elements.commissionAmount.textContent = `-$${Math.floor(amount * commission / 100).toLocaleString()} (${commission}%)`;
                 elements.cleanAmount.textContent = `$${cleanAmount.toLocaleString()}`;
                 elements.estimatedTime.textContent = `${estimatedTime}s`;
+
+                // Update new elements
+                if (elements.successChance) {
+                    elements.successChance.textContent = `${successChance.toFixed(1)}%`;
+                }
+                if (elements.policeAlert) {
+                    elements.policeAlert.textContent = `${policeConfig.alertChanceSuccess}% / ${policeConfig.alertChanceFail}%`;
+                }
 
                 elements.washCalculation.classList.remove('hidden');
             } else {
@@ -538,16 +577,36 @@
         }
 
         function updateWashMethodButtons() {
-            elements.standardMethod.className = 'py-3 px-4 rounded-lg font-medium transition-all bg-slate-700 text-slate-300 hover:bg-slate-600';
-            elements.fastMethod.className = 'py-3 px-4 rounded-lg font-medium transition-all bg-slate-700 text-slate-300 hover:bg-slate-600';
-            elements.secureMethod.className = 'py-3 px-4 rounded-lg font-medium transition-all bg-slate-700 text-slate-300 hover:bg-slate-600';
+            const baseClass = 'py-3 px-4 rounded-lg font-medium transition-all bg-slate-700 text-slate-300 hover:bg-slate-600 flex flex-col items-center';
+            const activeClass = 'py-3 px-4 rounded-lg font-medium transition-all bg-emerald-500 text-white shadow-lg flex flex-col items-center';
+
+            elements.standardMethod.className = baseClass;
+            elements.fastMethod.className = baseClass;
+            elements.secureMethod.className = baseClass;
 
             if (state.washMethod === 'standard') {
-                elements.standardMethod.className = 'py-3 px-4 rounded-lg font-medium transition-all bg-emerald-500 text-white shadow-lg';
+                elements.standardMethod.className = activeClass;
             } else if (state.washMethod === 'fast') {
-                elements.fastMethod.className = 'py-3 px-4 rounded-lg font-medium transition-all bg-emerald-500 text-white shadow-lg';
+                elements.fastMethod.className = activeClass;
             } else if (state.washMethod === 'secure') {
-                elements.secureMethod.className = 'py-3 px-4 rounded-lg font-medium transition-all bg-emerald-500 text-white shadow-lg';
+                elements.secureMethod.className = activeClass;
+            }
+
+            // Update method info from config
+            updateMethodInfo();
+        }
+
+        function updateMethodInfo() {
+            const washMethods = state.config.washMethods || {};
+
+            if (washMethods.standard && elements.standardInfo) {
+                elements.standardInfo.textContent = `Velocidad: ${washMethods.standard.speedMultiplier}x | Éxito: ${washMethods.standard.successBonus >= 0 ? '+' : ''}${washMethods.standard.successBonus}%`;
+            }
+            if (washMethods.fast && elements.fastInfo) {
+                elements.fastInfo.textContent = `Velocidad: ${washMethods.fast.speedMultiplier}x | Éxito: ${washMethods.fast.successBonus >= 0 ? '+' : ''}${washMethods.fast.successBonus}%`;
+            }
+            if (washMethods.secure && elements.secureInfo) {
+                elements.secureInfo.textContent = `Velocidad: ${washMethods.secure.speedMultiplier}x | Éxito: ${washMethods.secure.successBonus >= 0 ? '+' : ''}${washMethods.secure.successBonus}%`;
             }
         }
 
@@ -810,6 +869,18 @@
                         break;
                     case 'updateConfig':
                         state.config = data;
+                        state.config.police = data.police || { alertChanceSuccess: 5, alertChanceFail: 30 };
+                        updateMethodInfo();
+                        break;
+                    case 'washResult':
+                        state.washing = false;
+                        elements.washingProgress.classList.add('hidden');
+
+                        if (data.success) {
+                            showNotification(`Lavado completado: +$${data.cleanAmount.toLocaleString()}`, 'success');
+                        } else {
+                            showNotification(data.reason || 'El lavado ha fallado', 'error');
+                        }
                         break;
                     case 'showNotification':
                         showNotification(data.message, data.type);

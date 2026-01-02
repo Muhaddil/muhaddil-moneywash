@@ -4,7 +4,7 @@ lua54 'yes'
 
 author 'Muhaddil'
 description 'Money Wash System'
-version 'v2.0.1'
+version 'v2.0.2'
 
 shared_script 'config.lua'
 

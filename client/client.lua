@@ -69,6 +69,10 @@ end
 local function OpenUI()
     if uiOpened then return end
     uiOpened = true
+    local policeInfo = Config.police
+    if not policeInfo.enabled then
+        policeInfo = { alertChanceSuccess = 0, alertChanceFail = 0 }
+    end
     SetNuiFocus(true, true)
     SendUI('openUI', {})
     SendUI('updateStats', playerStats)
@@ -77,7 +81,9 @@ local function OpenUI()
     SendUI('updateConfig', {
         limits = Config.limits,
         economy = Config.economy,
-        reputation = Config.reputation
+        reputation = Config.reputation,
+        police = policeInfo,
+        washMethods = Config.washMethods
     })
     ESX.TriggerServerCallback('muhaddil-moneywash:isAdmin', function(isAdmin)
         SendUI('setAdminStatus', { isAdmin = isAdmin })
@@ -340,7 +346,7 @@ Citizen.CreateThread(function()
 
                     if Config.markers.pulse then
                         local pulse = math.abs(math.sin(GetGameTimer() / Config.markers.pulseSpeed)) * 0.2 +
-                        Config.markers.size.x
+                            Config.markers.size.x
                         DrawMarker(
                             Config.markers.type,
                             v.coords[1], v.coords[2], v.coords[3],
@@ -392,7 +398,6 @@ end, false)
 RegisterCommand(Config.commands.addLocation or 'addmoneywash', function(source, args)
     ESX.TriggerServerCallback('muhaddil-moneywash:isAdmin', function(isAdmin)
         if isAdmin then
-
             local job = args[1] or nil
 
             if not Config.permissions.allowMoneyWashersWithoutJobs and not job then
@@ -451,6 +456,13 @@ end
 RegisterNetEvent('muhaddil-moneywash:playSound')
 AddEventHandler('muhaddil-moneywash:playSound', function(sound)
     PlaySound(sound)
+end)
+
+RegisterNetEvent('muhaddil-moneywash:washResult')
+AddEventHandler('muhaddil-moneywash:washResult', function(result)
+    if uiOpened then
+        SendUI('washResult', result)
+    end
 end)
 
 DebugPrint("Money Wash Client Enhanced with Full Config - Loaded Successfully")

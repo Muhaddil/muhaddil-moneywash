@@ -638,6 +638,12 @@ AddEventHandler('muhaddil-moneywash:completeLavado', function(amount, cleanAmoun
             TriggerClientEvent('muhaddil-moneywash:playSound', _source, 'CHECKPOINT_MISSED')
         end
 
+        TriggerClientEvent('muhaddil-moneywash:washResult', _source, {
+            success = false,
+            cleanAmount = cleanAmount,
+            method = method
+        })
+
         if Config.discord.enabled and Config.discord.logFails then
             SendDiscordLog(
                 Config.discord.embeds.fail.title,

@@ -162,7 +162,7 @@ Config.economy = {
     timeBasedPricing = false,
 
     peakHours = { 2, 3, 4, 5 }, -- 2AM - 5AM
-    peakBonus = 5,            -- 5% menos de comisión
+    peakBonus = 5,              -- 5% menos de comisión
 
     volumeDiscount = 0.1,
     maxVolumeDiscount = 10 -- Máximo 10% de descuento
