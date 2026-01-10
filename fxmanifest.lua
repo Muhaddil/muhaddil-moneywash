@@ -19,6 +19,7 @@ server_scripts {
 shared_script '@ox_lib/init.lua'
 
 ui_page 'html/index.html'
+-- ui_page 'html/index-plomolife.html'
 
 files {
     'locales/*.json',

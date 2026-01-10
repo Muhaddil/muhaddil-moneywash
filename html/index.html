@@ -545,12 +545,10 @@
                 const commissionAdjustment = methodConfig.successBonus;
                 const commission = Math.max(10, Math.min(40, baseCommission + commissionAdjustment));
 
-                // Calculate success chance (base 95% + method bonus + reputation bonus)
                 const baseSuccessChance = 95;
                 const reputationBonus = state.stats.reputation ? (state.stats.reputation * 0.05) : 0;
                 const successChance = Math.max(0, Math.min(100, baseSuccessChance + methodConfig.successBonus + reputationBonus));
 
-                // Police alert chances from config
                 const policeConfig = state.config.police || { alertChanceSuccess: 5, alertChanceFail: 30 };
 
                 const cleanAmount = Math.floor(amount - (amount * commission / 100));
@@ -562,7 +560,6 @@
                 elements.cleanAmount.textContent = `$${cleanAmount.toLocaleString()}`;
                 elements.estimatedTime.textContent = `${estimatedTime}s`;
 
-                // Update new elements
                 if (elements.successChance) {
                     elements.successChance.textContent = `${successChance.toFixed(1)}%`;
                 }
@@ -592,7 +589,6 @@
                 elements.secureMethod.className = activeClass;
             }
 
-            // Update method info from config
             updateMethodInfo();
         }
 
