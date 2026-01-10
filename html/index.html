@@ -472,22 +472,36 @@
             }, 3000);
         }
 
-        function animateProgress(duration) {
-            let current = 0;
-            const totalSteps = duration * 20;
-            const stepTime = 50;
-            const increment = 100 / totalSteps;
+        let washingInterval = null;
 
-            const interval = setInterval(() => {
-                current += increment;
-                if (current >= 100) {
-                    current = 100;
-                    clearInterval(interval);
+        function animateProgress(durationSeconds) {
+            if (washingInterval) {
+                clearInterval(washingInterval);
+                washingInterval = null;
+            }
+
+            const stepTime = 50;               // ms
+            const totalSteps = Math.round(durationSeconds * 1000 / stepTime);
+            let step = 0;
+
+            updateProgress(0);
+            elements.washingProgress.classList.remove('hidden');
+            state.washing = true;
+
+            washingInterval = setInterval(() => {
+                step++;
+
+                const progress = (step / totalSteps) * 100;
+
+                if (step >= totalSteps) {
+                    clearInterval(washingInterval);
+                    washingInterval = null;
+
                     state.washing = false;
-                    updateProgress(current);
+                    updateProgress(100);
                     elements.washingProgress.classList.add('hidden');
                 } else {
-                    updateProgress(Math.floor(current));
+                    updateProgress(progress);
                 }
             }, stepTime);
         }
@@ -676,14 +690,25 @@
                     amount: parseInt(state.amount),
                     method: state.washMethod
                 })
-            }).catch(() => { });
-            state.washing = true;
-            elements.washingProgress.classList.remove('hidden');
-            animateProgress(duration);
-            showView('main');
-            showNotification('Iniciando proceso de lavado...', 'success');
-        }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (!data || !data.success) {
+                        showNotification(data?.reason || 'No se pudo iniciar el lavado', 'error');
+                        return;
+                    }
 
+                    state.washing = true;
+                    elements.washingProgress.classList.remove('hidden');
+                    animateProgress(data.duration);
+
+                    showView('main');
+                    showNotification('Iniciando proceso de lavado...', 'success');
+                })
+                .catch(() => {
+                    showNotification('Error de conexión con el servidor', 'error');
+                });
+        }
         function updateHistoryDisplay() {
             const container = elements.historyContainer;
             container.innerHTML = '';

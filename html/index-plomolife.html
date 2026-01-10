@@ -13,18 +13,18 @@
         }
 
         :root {
-            --primary-color: #10b981;
-            --primary-active: #34d399;
-            --primary-glow: rgba(16, 185, 129, 0.4);
-            --secondary-color: #3b82f6;
-            --danger-color: #ef4444;
+            --primary-color: #e55050;
+            --primary-active: #fd5050;
+            --primary-glow: rgba(229, 80, 80, 0.4);
+            --secondary-color: #10b981;
+            --danger-color: #e55050;
             --text-primary: #ffffff;
             --text-secondary: #ffffff;
             --text-muted: rgba(255, 255, 255, 0.6);
             --bg-dark: rgba(25, 25, 25, 0.95);
             --bg-card: rgba(36, 36, 36, 0.9);
             --bg-glass: rgba(36, 36, 36, 0.5);
-            --border-color: rgba(16, 185, 129, 0.2);
+            --border-color: rgba(229, 80, 80, 0.2);
             --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
             --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
             --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
@@ -334,9 +334,9 @@
             font-size: 24px;
         }
 
-        .stat-card.emerald .stat-icon {
-            color: #10b981;
-            border-color: rgba(16, 185, 129, 0.3);
+        .stat-card.red .stat-icon {
+            color: #e55050;
+            border-color: rgba(229, 80, 80, 0.3);
         }
 
         .stat-card.blue .stat-icon {
@@ -393,9 +393,9 @@
             font-size: 28px;
         }
 
-        .action-btn.emerald:hover {
-            border-color: #10b981;
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+        .action-btn.red:hover {
+            border-color: #e55050;
+            box-shadow: 0 0 20px rgba(229, 80, 80, 0.3);
         }
 
         .action-btn.blue:hover {
@@ -408,7 +408,7 @@
             box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
         }
 
-        .action-btn.red:hover {
+        .action-btn.danger:hover {
             border-color: #ef4444;
             box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
         }
@@ -439,21 +439,51 @@
         }
 
         .method-btn {
-            padding: 20px;
+            position: relative;
+            padding: 24px 20px;
             background: var(--bg-glass);
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
+            border: 3px solid var(--border-color);
+            border-radius: 16px;
             color: var(--text-muted);
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             text-align: center;
+            overflow: hidden;
+        }
+
+        .method-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-active));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .method-btn:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 20px var(--primary-glow);
+        }
+
+        .method-btn:hover::before {
+            transform: scaleX(1);
         }
 
         .method-btn.active {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-active));
-            border-color: var(--primary-color);
+            background: linear-gradient(135deg, rgba(229, 80, 80, 0.2), rgba(253, 80, 80, 0.2));
+            /* border-color: var(--primary-color); */
             color: var(--text-primary);
-            box-shadow: var(--shadow-glow);
+            /* box-shadow: var(--shadow-glow); */
+            transform: translateY(-4px);
+        }
+
+        .method-btn.active::before {
+            transform: scaleX(1);
         }
 
         .method-name {
@@ -461,6 +491,11 @@
             font-weight: bold;
             font-style: italic;
             margin-bottom: 8px;
+        }
+
+        .method-info {
+            font-size: 12px;
+            color: var(--text-muted);
         }
 
         .input-group {
@@ -881,7 +916,7 @@
 
                 <div id="mainView">
                     <div class="stats-grid">
-                        <div class="stat-card emerald">
+                        <div class="stat-card red">
                             <div class="stat-icon">
                                 <i class="fas fa-dollar-sign"></i>
                             </div>
@@ -912,7 +947,7 @@
                     </div>
 
                     <div class="actions-grid">
-                        <button class="action-btn emerald" id="washButton">
+                        <button class="action-btn red" id="washButton">
                             <i class="fas fa-money-bill-wave"></i>
                             <span>Lavar Dinero</span>
                         </button>
@@ -924,7 +959,7 @@
                             <i class="fas fa-history"></i>
                             <span>Historial</span>
                         </button>
-                        <button class="action-btn red hidden" id="adminButton">
+                        <button class="action-btn danger hidden" id="adminButton">
                             <i class="fas fa-cog"></i>
                             <span>Admin</span>
                         </button>
@@ -938,12 +973,15 @@
                         <div class="method-grid">
                             <button class="method-btn active" id="standardMethod">
                                 <div class="method-name">Estándar</div>
+                                <div class="method-info" id="standardInfo">Velocidad: 1.0x | Éxito: +0%</div>
                             </button>
                             <button class="method-btn" id="fastMethod">
                                 <div class="method-name">Rápido</div>
+                                <div class="method-info" id="fastInfo">Velocidad: 0.5x | Éxito: -10%</div>
                             </button>
                             <button class="method-btn" id="secureMethod">
                                 <div class="method-name">Seguro</div>
+                                <div class="method-info" id="secureInfo">Velocidad: 1.5x | Éxito: +5%</div>
                             </button>
                         </div>
 
@@ -1005,7 +1043,7 @@
                     </div>
 
                     <div class="stats-grid">
-                        <div class="stat-card emerald">
+                        <div class="stat-card red">
                             <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
                             <div class="stat-label">Total Lavado</div>
                             <div class="stat-value" id="statsTotalWashed">$0</div>
@@ -1191,22 +1229,36 @@
             }, 3000);
         }
 
-        function animateProgress(duration) {
-            let current = 0;
-            const totalSteps = duration * 20;
-            const stepTime = 50;
-            const increment = 100 / totalSteps;
+        let washingInterval = null;
 
-            const interval = setInterval(() => {
-                current += increment;
-                if (current >= 100) {
-                    current = 100;
-                    clearInterval(interval);
+        function animateProgress(durationSeconds) {
+            if (washingInterval) {
+                clearInterval(washingInterval);
+                washingInterval = null;
+            }
+
+            const stepTime = 50;               // ms
+            const totalSteps = Math.round(durationSeconds * 1000 / stepTime);
+            let step = 0;
+
+            updateProgress(0);
+            elements.washingProgress.classList.remove('hidden');
+            state.washing = true;
+
+            washingInterval = setInterval(() => {
+                step++;
+
+                const progress = (step / totalSteps) * 100;
+
+                if (step >= totalSteps) {
+                    clearInterval(washingInterval);
+                    washingInterval = null;
+
                     state.washing = false;
-                    updateProgress(current);
+                    updateProgress(100);
                     elements.washingProgress.classList.add('hidden');
                 } else {
-                    updateProgress(Math.floor(current));
+                    updateProgress(progress);
                 }
             }, stepTime);
         }
@@ -1218,7 +1270,7 @@
         }
 
         function updateStatsDisplay() {
-            elements.totalWashed.textContent = `$${state.stats.totalWashed.toLocaleString()}`;
+            elements.totalWashed.textContent = `${state.stats.totalWashed.toLocaleString()}`;
             elements.totalTransactions.textContent = state.stats.totalTransactions;
             elements.successRate.textContent = `${state.stats.successRate}%`;
             elements.reputation.textContent = `${state.stats.reputation}/100`;
@@ -1226,10 +1278,10 @@
             elements.reputationBar.style.width = `${state.stats.reputation}%`;
             elements.reputationPercent.textContent = `${state.stats.reputation}%`;
 
-            elements.statsTotalWashed.textContent = `$${state.stats.totalWashed.toLocaleString()}`;
+            elements.statsTotalWashed.textContent = `${state.stats.totalWashed.toLocaleString()}`;
             elements.statsTotalTransactions.textContent = state.stats.totalTransactions;
             elements.statsSuccessRate.textContent = `${state.stats.successRate}%`;
-            elements.statsAverage.textContent = `$${state.stats.totalTransactions > 0 ? Math.floor(state.stats.totalWashed / state.stats.totalTransactions).toLocaleString() : 0}`;
+            elements.statsAverage.textContent = `${state.stats.totalTransactions > 0 ? Math.floor(state.stats.totalWashed / state.stats.totalTransactions).toLocaleString() : 0}`;
         }
 
         function updateWashCalculation() {
@@ -1271,9 +1323,9 @@
                 const baseTime = Math.max(1, Math.floor(amount * 0.002));
                 const estimatedTime = Math.floor(baseTime * methodConfig.speedMultiplier);
 
-                elements.washAmount.textContent = `$${amount.toLocaleString()}`;
-                elements.commissionAmount.textContent = `-$${Math.floor(amount * commission / 100).toLocaleString()} (${commission}%)`;
-                elements.cleanAmount.textContent = `$${cleanAmount.toLocaleString()}`;
+                elements.washAmount.textContent = `${amount.toLocaleString()}`;
+                elements.commissionAmount.textContent = `-${Math.floor(amount * commission / 100).toLocaleString()} (${commission}%)`;
+                elements.cleanAmount.textContent = `${cleanAmount.toLocaleString()}`;
                 elements.estimatedTime.textContent = `${estimatedTime}s`;
 
                 if (elements.successChance) {
@@ -1290,19 +1342,16 @@
         }
 
         function updateWashMethodButtons() {
-            const baseClass = 'py-3 px-4 rounded-lg font-medium transition-all bg-slate-700 text-slate-300 hover:bg-slate-600 flex flex-col items-center';
-            const activeClass = 'py-3 px-4 rounded-lg font-medium transition-all bg-emerald-500 text-white shadow-lg flex flex-col items-center';
+            elements.standardMethod.classList.remove('active');
+            elements.fastMethod.classList.remove('active');
+            elements.secureMethod.classList.remove('active');
 
-            if (elements.standardMethod) elements.standardMethod.className = baseClass;
-            if (elements.fastMethod) elements.fastMethod.className = baseClass;
-            if (elements.secureMethod) elements.secureMethod.className = baseClass;
-
-            if (state.washMethod === 'standard' && elements.standardMethod) {
-                elements.standardMethod.className = activeClass;
-            } else if (state.washMethod === 'fast' && elements.fastMethod) {
-                elements.fastMethod.className = activeClass;
-            } else if (state.washMethod === 'secure' && elements.secureMethod) {
-                elements.secureMethod.className = activeClass;
+            if (state.washMethod === 'standard') {
+                elements.standardMethod.classList.add('active');
+            } else if (state.washMethod === 'fast') {
+                elements.fastMethod.classList.add('active');
+            } else if (state.washMethod === 'secure') {
+                elements.secureMethod.classList.add('active');
             }
 
             updateMethodInfo();
@@ -1397,12 +1446,24 @@
                     amount: parseInt(state.amount),
                     method: state.washMethod
                 })
-            }).catch(() => { });
-            state.washing = true;
-            elements.washingProgress.classList.remove('hidden');
-            animateProgress(duration);
-            showView('main');
-            showNotification('Iniciando proceso de lavado...', 'success');
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (!data || !data.success) {
+                        showNotification(data?.reason || 'No se pudo iniciar el lavado', 'error');
+                        return;
+                    }
+
+                    state.washing = true;
+                    elements.washingProgress.classList.remove('hidden');
+                    animateProgress(data.duration);
+
+                    showView('main');
+                    showNotification('Iniciando proceso de lavado...', 'success');
+                })
+                .catch(() => {
+                    showNotification('Error de conexión con el servidor', 'error');
+                });
         }
 
         function updateHistoryDisplay() {
@@ -1424,7 +1485,7 @@
                 transactionElement.innerHTML = `
                     <div class="history-header">
                         <div class="history-amount">
-                            <i class="fas ${iconClass}" style="color: ${transaction.success ? '#10b981' : '#ef4444'}"></i>
+                            <i class="fas ${iconClass}" style="color: ${transaction.success ? '#e55050' : '#ef4444'}"></i>
                             <span>${transaction.amount.toLocaleString()}</span>
                         </div>
                         <span class="history-time">${transaction.time}</span>
@@ -1545,7 +1606,6 @@
                 updateWashCalculation();
             });
 
-
             elements.amountInput.addEventListener('input', (e) => {
                 state.amount = e.target.value;
                 updateWashCalculation();
@@ -1594,7 +1654,7 @@
                         elements.washingProgress.classList.add('hidden');
 
                         if (data.success) {
-                            showNotification(`Lavado completado: +$${data.cleanAmount.toLocaleString()}`, 'success');
+                            showNotification(`Lavado completado: +${data.cleanAmount.toLocaleString()}`, 'success');
                         } else {
                             showNotification(data.reason || 'El lavado ha fallado', 'error');
                         }
